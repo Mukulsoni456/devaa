@@ -6,12 +6,13 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA0DVnRlQrPyeOe3br7m603YRQW5LbCSS4",
-    authDomain: "devra-a0221.firebaseapp.com",
-    projectId: "devra-a0221",
-    storageBucket: "devra-a0221.firebasestorage.app",
-    messagingSenderId: "219832255987",
-    appId: "1:219832255987:web:440e531cde5c65277b7e86"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  
   };
   
   const app = initializeApp(firebaseConfig);
