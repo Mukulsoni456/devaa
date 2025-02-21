@@ -25,7 +25,7 @@ export default function BlogSection() {
 
   useEffect(() => {
     fetchBlogs();
-  }, []);
+  }, [fetchBlogs]);
 
   return (
     <section className="py-16 md:py-28 px-8 bg-white text-center">

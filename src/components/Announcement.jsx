@@ -34,7 +34,7 @@ export default function AnnouncementSection() {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  }, [fetchAnnouncements]);
 
   // Convert Firestore Timestamp or string to comparable date format
   const getFormattedDate = (event) => {

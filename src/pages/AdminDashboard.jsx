@@ -74,7 +74,7 @@ export default function EventCalendar() {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
 
   const fetchPosts = async () => {
     const querySnapshot = await getDocs(collection(db, "posts"));
