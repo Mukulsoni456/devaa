@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
-import { FaHome, FaImages, FaInfoCircle, FaNewspaper, FaHandsHelping, FaPhone } from "react-icons/fa";
+import { FaHome, FaImages, FaInfoCircle, FaNewspaper, FaHandsHelping, FaPhone, FaSignInAlt } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
 
 const handleLogout = async () => {
@@ -27,12 +27,13 @@ const Navbar = () => {
     { name: "blogs", icon: <FaNewspaper size={24} />, label: "Blogs", link: "/blogs" },
     { name: "donation", icon: <FaHandsHelping size={24} />, label: "Donations", link: "/donation" },
     { name: "contact", icon: <FaPhone size={24} />, label: "Contact", link: "/contact" },
+    { name: "login", icon: <FaSignInAlt size={24} />, label: "Login", link: "/login" },
   ];
 
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="bg-[#fee7c7] p-4 px-10 hidden md:flex justify-between items-center shadow-md">
+      <nav className="bg-[#fee7c7] p-4 hidden md:flex justify-between items-center shadow-md">
         <div className="flex space-x-6 text-black font-medium">
           <Link to="/" className="hover:text-orange-400">Home</Link>
           <Link to="/Gallery" className="hover:text-orange-400">Gallery</Link>
@@ -45,11 +46,12 @@ const Navbar = () => {
           <Link to="/blogs" className="hover:text-orange-400">Blogs</Link>
           <Link to="/donation" className="hover:text-orange-400">Donations</Link>
           <Link to="/contact" className="hover:text-orange-400">Contact Us</Link>
+          <Link to="/login" className="hover:text-orange-400">Login</Link>
         </div>
       </nav>
       
       {/* Mobile Navbar */}
-      <nav className="bg-[#fee7c7] p-5 fixed bottom-0 left-1/2 -translate-x-1/2 w-full rounded-2xl shadow-lg flex justify-around items-center md:hidden z-50">
+      <nav className="bg-[#fee7c7] p-4 fixed bottom-4 left-1/2 -translate-x-1/2 w-80 rounded-2xl shadow-lg flex justify-around items-center md:hidden z-50">
         {navItems.map((item) => (
           <Link
             key={item.name}

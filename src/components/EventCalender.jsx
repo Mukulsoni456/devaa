@@ -50,7 +50,7 @@ export default function Calendar() {
 
   return (
     <div className="bg-orange-50">
-      <div className="p-10 md:px-52 lg:flex">
+      <div className="p-8 md:px-52 lg:flex">
         {/* Calendar */}
         <div className="lg:w-3/5 w-full bg-white shadow-lg p-10 rounded-lg md:rounded-none">
           <div className="flex items-center justify-between">
