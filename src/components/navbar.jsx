@@ -51,7 +51,7 @@ const Navbar = () => {
       </nav>
       
       {/* Mobile Navbar */}
-      <nav className="bg-[#fee7c7] p-4 fixed bottom-4 left-1/2 -translate-x-1/2 w-80 rounded-2xl shadow-lg flex justify-around items-center md:hidden z-50">
+      <nav className="bg-[#fee7c7] p-4 fixed bottom-0 left-1/2 -translate-x-1/2 w-full  shadow-lg flex justify-around items-center md:hidden z-50">
         {navItems.map((item) => (
           <Link
             key={item.name}
