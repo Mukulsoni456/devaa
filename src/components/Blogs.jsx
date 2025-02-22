@@ -62,7 +62,7 @@ export default function BlogSection() {
       <div className="mt-10">
         <a
           href="/blogs" // Update with the actual blog page URL
-          className="bg-[#eca427] text-white font-semibold py-3 px-6 rounded-lg shadow-md transition hover:bg-[#eca427]"
+          className="bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition hover:bg-orange-600"
         >
           Read All Blogs
         </a>

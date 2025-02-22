@@ -1,5 +1,5 @@
 import gallery1 from '../assets/gallery1.jpg'
-
+import { Link } from "react-router-dom";
 export default function ImageGrid() {
     const images = [
       "gallery3.jpg",
@@ -22,10 +22,11 @@ export default function ImageGrid() {
 
               <p className="mt-4 text-gray-600">
                 Discover stunning visuals and artistic expressions that capture the beauty of the world.
-              </p>
-              <button className="mt-6 bg-[#eca427] text-white py-3 px-6  shadow-lg hover:bg-blue-700 transition-all">
+              </p> 
+              <Link to='/gallery'>
+              <button className="mt-6 bg-orange-500 text-white py-3 px-6  shadow-lg hover:bg-orange-600 transition-all">
                 View Gallery
-              </button>
+              </button></Link>
             </div>
     
             {/* Right Side Image Grid */}

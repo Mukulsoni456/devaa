@@ -1,5 +1,5 @@
 import donationImage from '../assets/gallery3.jpg'
-
+import { Link } from 'react-router-dom';
 export default function DonationSection() {
     return (
       <section className="relative w-full h-[500px] flex items-center justify-center text-center">
@@ -27,7 +27,7 @@ export default function DonationSection() {
 
           </div>
           <div className='flex justify-center items-center'>
-          <div className='bg-[#eca427] text-black p-4 mt-8 rounded-md w-full sm:w-24 '>Donate</div>
+          <Link to='/donation' > <div className='bg-[#eca427] text-black p-4 mt-8 rounded-md w-full sm:w-24 '>Donate</div> </Link>
           </div>
         </div>
       </section>
