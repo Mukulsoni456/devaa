@@ -3,6 +3,8 @@ import { db, storage } from "../firebaseConfig";
 import { collection,setDoc, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where,onSnapshot  } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import dayjs from "dayjs";
+import { useAuth } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function EventCalendar() {
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -11,7 +13,7 @@ export default function EventCalendar() {
   const [eventText, setEventText] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [votes, setVotes] = useState({});
+  const [yes, setYes] = useState({});
 
   // Blog/News States
   const [postType, setPostType] = useState("blog"); // blog or news
@@ -30,40 +32,31 @@ export default function EventCalendar() {
   const [eventDate, setEventDate] = useState("");
 
 
+
+  useEffect(() => {
+    fetchEvents(); // Call the correct function
+ }, []);
+ 
   // Fetch events from Firebase
-  const fetchEvents = async () => {
-    const eventSnapshot = await getDocs(collection(db, "calendarEvents"));
-    const eventData = {};
-  
-    eventSnapshot.forEach((doc) => {
-      const { date, event, votes = 0 } = doc.data();
-      if (!eventData[date]) eventData[date] = [];
-      eventData[date].push({ id: doc.id, event, votes });
+  const fetchEvents = () => {
+    const unsubscribe = onSnapshot(collection(db, "calendarEvents"), (snapshot) => {
+      const eventData = {};
+      snapshot.forEach((doc) => {
+        const { date, event, yes = 0 } = doc.data();
+        if (!eventData[date]) eventData[date] = [];
+        eventData[date].push({ id: doc.id, event, yes });
+      });
+      setEvents(eventData);
     });
   
-    setEvents(eventData);
+    return unsubscribe; // Unsubscribe when component unmounts
   };
   
-  
   useEffect(() => {
-    const fetchEvents = async () => {
-      const snapshot = await getDocs(collection(db, "events"));
-      let updatedEvents = {};
+    const unsubscribe = fetchEvents();
+    return () => unsubscribe();
+  }, []);
   
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const eventDate = data.date; 
-        if (!updatedEvents[eventDate]) {
-          updatedEvents[eventDate] = [];
-        }
-        updatedEvents[eventDate].push({ id: doc.id, event: data.name, votes: data.votes });
-      });
-  
-      setEvents(updatedEvents); 
-    };
-  
-    fetchEvents();
-  }, []); 
   
   
   
@@ -71,10 +64,6 @@ export default function EventCalendar() {
 
 
 
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
 
   const fetchPosts = async () => {
     const querySnapshot = await getDocs(collection(db, "posts"));
@@ -84,6 +73,11 @@ export default function EventCalendar() {
     }));
     setPosts(fetchedPosts);
   };
+
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const handleEditPost = (post) => {
     setEditingPost(post);
@@ -174,7 +168,7 @@ export default function EventCalendar() {
       await addDoc(collection(db, "calendarEvents"), {
         date: selectedDate,
         event: eventText,
-        votes: 0, // Default vote count
+        yes: 0, // Default vote count
       });
     }
 
@@ -226,6 +220,12 @@ export default function EventCalendar() {
     setIsLoading(false);
   };
 
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  if (!user) {
+    navigate("/admin-login");
+    return null; // Prevent rendering the page
+  }
   return (
     <div className="bg-orange-50">
       <div className="p-10 md:px-52 lg:flex">
@@ -272,11 +272,11 @@ export default function EventCalendar() {
           <h3 className="font-medium">Upcoming Events</h3>
           {selectedDate && events[selectedDate] ? (
             <ul className="mt-3">
-              {events[selectedDate].map(({ id, event, votes }) => (
+              {events[selectedDate].map(({ id, event, yes }) => (
                 <li key={id} className="text-gray-600 flex justify-between items-center mt-3 border-b pb-2">
                   <div>
                     <span>{event}</span>
-                    <p className="text-sm text-gray-600">Votes: {votes}</p>
+                    <p className="text-sm text-gray-600">Votes: {yes}</p>
 
                   </div>
                   <div className="flex space-x-2">

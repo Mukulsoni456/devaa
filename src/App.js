@@ -14,6 +14,7 @@ import DonationPage from './pages/DonationPage';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import BlogPage from './pages/BlogPage';
+import BackNav from './components/BackNav';
 
 
 
@@ -22,7 +23,9 @@ import BlogPage from './pages/BlogPage';
 function App() {
   return (
     <Router>
+
       <Navbar />
+  
       <Routes>
       <Route path='/' Component={Home} ></Route>
       <Route path="/blog/:id" Component={BlogDetail} />

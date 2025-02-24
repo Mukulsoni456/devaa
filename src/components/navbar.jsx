@@ -5,6 +5,8 @@ import { auth } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
 import { FaHome, FaImages, FaInfoCircle, FaNewspaper, FaHandsHelping, FaPhone, FaSignInAlt } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
+import BackNav from "./BackNav";
+
 
 const handleLogout = async () => {
   try {
@@ -16,6 +18,7 @@ const handleLogout = async () => {
 };
 
 const Navbar = () => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState("home");
   const [user] = useAuthState(auth);
@@ -34,6 +37,7 @@ const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <nav className="bg-[#fee7c7] p-4 hidden md:flex justify-between items-center shadow-md">
+
         <div className="flex space-x-6 text-black font-medium">
           <Link to="/" className="hover:text-orange-400">Home</Link>
           <Link to="/Gallery" className="hover:text-orange-400">Gallery</Link>
@@ -51,6 +55,8 @@ const Navbar = () => {
       </nav>
       
       {/* Mobile Navbar */}
+      <div>
+        <BackNav></BackNav>
       <nav className="bg-[#fee7c7] p-4 fixed bottom-0 left-1/2 -translate-x-1/2 w-full  shadow-lg flex justify-around items-center md:hidden z-50">
         {navItems.map((item) => (
           <Link
@@ -70,6 +76,7 @@ const Navbar = () => {
           </Link>
         ))}
       </nav>
+      </div>
     </>
   );
 };
@@ -79,3 +86,8 @@ export default Navbar;
 // Tailwind Animations in global CSS
 // .animate-fadeIn { animation: fadeIn 0.3s ease-in-out; }
 // @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); }}
+
+
+
+
+ 

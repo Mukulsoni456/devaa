@@ -2,15 +2,22 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signInWithGoogle, logout } from "../firebaseConfig";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 
 export default function Login() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false); // State for popup
 
   // Redirect to home only if the user is authenticated
   useEffect(() => {
     if (user) {
-      navigate("/"); // Redirect to home after login
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false); // Hide popup after 3 seconds
+        navigate("/"); // Redirect to home
+      }, 3000);
     }
   }, [user, navigate]);
 
@@ -35,6 +42,20 @@ export default function Login() {
           </button>
         )}
       </div>
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h3 className="text-xl font-bold mb-2">Login Successful!</h3>
+            <p className="text-gray-700">Welcome, {user?.displayName} 🎉</p>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
