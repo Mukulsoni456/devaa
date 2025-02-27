@@ -8,12 +8,51 @@ import { useNavigate } from "react-router-dom";
 
 export default function EventCalendar() {
   const [currentDate, setCurrentDate] = useState(dayjs());
+  
   const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [eventText, setEventText] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [yes, setYes] = useState({});
+
+
+ //for toggle posts 
+const [activeTab, setActiveTab] = useState("blog"); // Toggle between blogs and events
+
+const [selectedMediaDate, setSelecteMediadDate] = useState("");
+const [eventName, setEventName] = useState("");
+const [mediaFile, setMediaFile] = useState(null);
+
+const handleUploadMedia = async () => {
+    if (!mediaFile || !selectedDate || !eventName) {
+      return alert("Please select a date, enter an event name, and choose a file.");
+    }
+
+    const fileType = mediaFile.type.startsWith("image")
+      ? "image"
+      : mediaFile.type.startsWith("video")
+      ? "video"
+      : "pdf";
+
+    const fileRef = ref(storage, `eventMedia/${selectedDate}/${mediaFile.name}`);
+    await uploadBytes(fileRef, mediaFile);
+    const fileURL = await getDownloadURL(fileRef);
+
+    await addDoc(collection(db, "eventMedia"), {
+      date: selectedMediaDate,
+      eventName,
+      fileURL,
+      fileType,
+      uploadedAt: new Date(),
+    });
+
+    alert("File uploaded successfully!");
+    setSelectedDate("");
+    setEventName("");
+    setMediaFile(null);
+  };
+
 
   // Blog/News States
   const [postType, setPostType] = useState("blog"); // blog or news
@@ -226,6 +265,8 @@ export default function EventCalendar() {
     navigate("/admin-login");
     return null; // Prevent rendering the page
   }
+
+  
   return (
     <div className="bg-orange-50">
       <div className="p-10 md:px-52 lg:flex">
@@ -364,18 +405,32 @@ export default function EventCalendar() {
         </div>
       )}
        <div className="p-6 bg-white shadow-lg rounded-lg">
+        <div>
+        <button
+            className={`px-4 py-2 mx-2 ${activeTab === "blog" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab("blog")}
+          >
+            Blogs
+          </button>
+          <button
+            className={`px-4 py-2 ${activeTab === "event" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab("event")}
+          >
+            Events
+          </button>
+        </div>
       <h2 className="text-2xl font-bold mb-4">Manage Posts</h2>
 
       {posts.length === 0 ? (
         <p>No posts available</p>
       ) : (
         <ul>
-          {posts.map((post) => (
+          {posts.filter((post) => post.type === activeTab).map((post) => (
             <li key={post.id} className="mb-4 p-4 border rounded flex justify-between">
               <div>
                 <h3 className="font-semibold">{post.title}</h3>
                 <p className="text-gray-500">{post.description}</p>
-                <p className="text-sm font-semibold text-blue-600">Type: {post.postType}</p>
+  
               </div>
               <div>
                 <button
@@ -450,7 +505,35 @@ export default function EventCalendar() {
 )}
 
     </div>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Upload Event Media</h2>
+      <input
+        type="date"
+        value={selectedMediaDate}
+        onChange={(e) => setSelecteMediadDate(e.target.value)}
+        className="border p-2 mb-2 w-full"
+      />
+      <input
+        type="text"
+        placeholder="Enter event name"
+        value={eventName}
+        onChange={(e) => setEventName(e.target.value)}
+        className="border p-2 mb-2 w-full"
+      />
+      <input
+        type="file"
+        onChange={(e) => setMediaFile(e.target.files[0])}
+        className="border p-2 mb-2 w-full"
+      />
+      <button
+        onClick={handleUploadMedia}
+        className="bg-blue-500 text-white p-2 rounded w-full"
+      >
+        Upload Media
+      </button>
     </div>
+    </div>
+    
     
 
   );

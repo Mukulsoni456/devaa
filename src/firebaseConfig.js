@@ -1,7 +1,7 @@
 // src/firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut,RecaptchaVerifier, signInWithPhoneNumber  } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
@@ -37,6 +37,6 @@ const signInWithGoogle = async () => {
     signOut(auth);
   };
 
-  export { db, storage, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, auth, signInWithGoogle, logout };
+  export { db, storage, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, auth, signInWithGoogle, logout, };
 
 
