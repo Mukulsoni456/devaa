@@ -21,7 +21,7 @@
     "twilio": "^5.4.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "CI=false react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

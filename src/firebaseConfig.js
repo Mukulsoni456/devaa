@@ -37,6 +37,6 @@ const signInWithGoogle = async () => {
     signOut(auth);
   };
 
-  export { db, storage, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, auth, signInWithGoogle, logout, };
+  export { db, storage, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, auth, signInWithGoogle, logout, RecaptchaVerifier, signInWithPhoneNumber  };
 
 
