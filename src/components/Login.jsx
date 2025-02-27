@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "../firebaseConfig"; // Ensure correct Firebase config import
 
@@ -8,8 +8,8 @@ export default function OTPLogin() {
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [error, setError] = useState("");
 
-  // ✅ Initialize reCAPTCHA properly
-  const setupRecaptcha = () => {
+  // ✅ Initialize reCAPTCHA properly when component mounts
+  useEffect(() => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
@@ -17,12 +17,15 @@ export default function OTPLogin() {
           console.log("reCAPTCHA verified ✅");
         },
         "expired-callback": () => {
-          setError("reCAPTCHA expired. Refresh and try again.");
+          setError("reCAPTCHA expired. Please refresh and try again.");
         },
       });
-      window.recaptchaVerifier.render();
+
+      window.recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaWidgetId = widgetId;
+      });
     }
-  };
+  }, []);
 
   // ✅ Send OTP with reCAPTCHA verification
   const handleSendOtp = async () => {
@@ -34,8 +37,12 @@ export default function OTPLogin() {
     }
 
     try {
-      setupRecaptcha();
       const appVerifier = window.recaptchaVerifier;
+      if (!appVerifier) {
+        setError("reCAPTCHA not initialized. Refresh and try again.");
+        return;
+      }
+
       const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
       setConfirmationResult(confirmation);
       alert("OTP sent! ✅ Check your phone.");
@@ -48,6 +55,10 @@ export default function OTPLogin() {
   const handleVerifyOtp = async () => {
     setError("");
     try {
+      if (!confirmationResult) {
+        setError("No OTP request found. Please request OTP first.");
+        return;
+      }
       await confirmationResult.confirm(otp);
       alert("OTP Verified! ✅ Login Successful.");
     } catch (error) {
@@ -61,7 +72,7 @@ export default function OTPLogin() {
         <h2 className="text-2xl font-bold mb-4">Login with OTP</h2>
         {error && <p className="text-red-500">{error}</p>}
 
-        <div id="recaptcha-container"></div> {/* ✅ reCAPTCHA container */}
+        <div id="recaptcha-container"></div> {/* ✅ Always in DOM */}
 
         {confirmationResult ? (
           <>
