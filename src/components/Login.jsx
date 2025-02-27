@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { useNavigate } from "react-router-dom"; // ✅ For automatic redirection
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "../firebaseConfig"; // Ensure correct Firebase config import
 
 export default function OTPLogin() {
@@ -7,6 +8,7 @@ export default function OTPLogin() {
   const [otp, setOtp] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [error, setError] = useState("");
+  const navigate = useNavigate(); // ✅ Use for redirection
 
   // ✅ Initialize reCAPTCHA properly when component mounts
   useEffect(() => {
@@ -21,13 +23,11 @@ export default function OTPLogin() {
         },
       });
 
-      window.recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId;
-      });
+      window.recaptchaVerifier.render();
     }
   }, []);
 
-  // ✅ Send OTP with reCAPTCHA verification
+  // ✅ Send OTP and automatically move to OTP input
   const handleSendOtp = async () => {
     setError("");
 
@@ -51,7 +51,7 @@ export default function OTPLogin() {
     }
   };
 
-  // ✅ Verify OTP
+  // ✅ Verify OTP and automatically redirect to home page
   const handleVerifyOtp = async () => {
     setError("");
     try {
@@ -61,6 +61,7 @@ export default function OTPLogin() {
       }
       await confirmationResult.confirm(otp);
       alert("OTP Verified! ✅ Login Successful.");
+      navigate("/home"); // ✅ Redirect to Home page after successful login
     } catch (error) {
       setError("Invalid OTP. Please try again.");
     }
@@ -83,7 +84,7 @@ export default function OTPLogin() {
               onChange={(e) => setOtp(e.target.value)}
               className="mb-4 p-2 border rounded w-full"
             />
-            <button onClick={handleVerifyOtp} className="bg-green-500 text-white px-4 py-2 rounded">
+            <button onClick={handleVerifyOtp} className="bg-green-500 text-white px-4 py-2 rounded w-full">
               Verify OTP
             </button>
           </>
@@ -96,7 +97,7 @@ export default function OTPLogin() {
               onChange={(e) => setPhone(e.target.value)}
               className="mb-4 p-2 border rounded w-full"
             />
-            <button onClick={handleSendOtp} className="bg-blue-500 text-white px-4 py-2 rounded">
+            <button onClick={handleSendOtp} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
               Send OTP
             </button>
           </>
