@@ -8,6 +8,7 @@ export default function OTPLogin() {
   const [otp, setOtp] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [error, setError] = useState("");
+  const [popup, setPopup] = useState({ show: false, message: "", type: "" }); // ✅ Custom Popup State
   const navigate = useNavigate(); // ✅ Use for redirection
 
   // ✅ Initialize reCAPTCHA properly when component mounts
@@ -27,6 +28,12 @@ export default function OTPLogin() {
     }
   }, []);
 
+  // ✅ Show Custom Popup
+  const showPopup = (message, type = "success") => {
+    setPopup({ show: true, message, type });
+    setTimeout(() => setPopup({ show: false, message: "", type: "" }), 3000);
+  };
+
   // ✅ Send OTP and automatically move to OTP input
   const handleSendOtp = async () => {
     setError("");
@@ -45,7 +52,7 @@ export default function OTPLogin() {
 
       const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
       setConfirmationResult(confirmation);
-      alert("OTP sent! ✅ Check your phone.");
+      showPopup("OTP sent! ✅ Check your phone.");
     } catch (error) {
       setError(error.message || "Failed to send OTP. Check internet connection.");
     }
@@ -60,10 +67,11 @@ export default function OTPLogin() {
         return;
       }
       await confirmationResult.confirm(otp);
-      alert("OTP Verified! ✅ Login Successful.");
-      navigate("/home"); // ✅ Redirect to Home page after successful login
+      showPopup("OTP Verified! ✅ Login Successful.", "success");
+
+      setTimeout(() => navigate("/"), 2000); // ✅ Redirect to Home page after 2 seconds
     } catch (error) {
-      setError("Invalid OTP. Please try again.");
+      showPopup("Invalid OTP. Please try again.", "error");
     }
   };
 
@@ -103,6 +111,14 @@ export default function OTPLogin() {
           </>
         )}
       </div>
+
+      {/* ✅ Custom Popup */}
+      {popup.show && (
+        <div className={`fixed bottom-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white 
+            ${popup.type === "success" ? "bg-green-500" : "bg-red-500"}`}>
+          {popup.message}
+        </div>
+      )}
     </div>
   );
 }
