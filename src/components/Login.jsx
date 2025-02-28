@@ -1,43 +1,37 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ For automatic redirection
+import { useNavigate } from "react-router-dom"; // ✅ For redirection
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { auth } from "../firebaseConfig"; // Ensure correct Firebase config import
+import { auth } from "../firebaseConfig";
 
 export default function OTPLogin() {
+  const [name, setName] = useState(""); // ✅ New field for Name
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [error, setError] = useState("");
-  const [popup, setPopup] = useState({ show: false, message: "", type: "" }); // ✅ Custom Popup State
-  const navigate = useNavigate(); // ✅ Use for redirection
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const navigate = useNavigate();
 
-  // ✅ Initialize reCAPTCHA properly when component mounts
+  // ✅ Initialize reCAPTCHA when component mounts
   useEffect(() => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
-        callback: () => {
-          console.log("reCAPTCHA verified ✅");
-        },
-        "expired-callback": () => {
-          setError("reCAPTCHA expired. Please refresh and try again.");
-        },
+        callback: () => console.log("reCAPTCHA verified ✅"),
+        "expired-callback": () => setError("reCAPTCHA expired. Refresh and try again."),
       });
-
       window.recaptchaVerifier.render();
     }
   }, []);
 
-  // ✅ Show Custom Popup
-  const showPopup = (message, type = "success") => {
-    setPopup({ show: true, message, type });
-    setTimeout(() => setPopup({ show: false, message: "", type: "" }), 3000);
-  };
-
-  // ✅ Send OTP and automatically move to OTP input
+  // ✅ Send OTP
   const handleSendOtp = async () => {
     setError("");
 
+    if (name.trim() === "") {
+      setError("Please enter your name.");
+      return;
+    }
     if (!phone.match(/^\+91\d{10}$/)) {
       setError("Enter a valid Indian number in +91 format.");
       return;
@@ -45,20 +39,14 @@ export default function OTPLogin() {
 
     try {
       const appVerifier = window.recaptchaVerifier;
-      if (!appVerifier) {
-        setError("reCAPTCHA not initialized. Refresh and try again.");
-        return;
-      }
-
       const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
       setConfirmationResult(confirmation);
-      showPopup("OTP sent! ✅ Check your phone.");
     } catch (error) {
-      setError(error.message || "Failed to send OTP. Check internet connection.");
+      setError(error.message || "Failed to send OTP.");
     }
   };
 
-  // ✅ Verify OTP and automatically redirect to home page
+  // ✅ Verify OTP
   const handleVerifyOtp = async () => {
     setError("");
     try {
@@ -67,21 +55,22 @@ export default function OTPLogin() {
         return;
       }
       await confirmationResult.confirm(otp);
-      showPopup("OTP Verified! ✅ Login Successful.", "success");
-
-      setTimeout(() => navigate("/"), 2000); // ✅ Redirect to Home page after 2 seconds
+      setShowSuccessPopup(true); // ✅ Show custom success popup
+      setTimeout(() => {
+        navigate("/"); // ✅ Redirect to Home page
+      }, 2000);
     } catch (error) {
-      showPopup("Invalid OTP. Please try again.", "error");
+      setError("Invalid OTP. Please try again.");
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
+      <div className="bg-white p-8 rounded-lg shadow-md text-center relative">
         <h2 className="text-2xl font-bold mb-4">Login with OTP</h2>
         {error && <p className="text-red-500">{error}</p>}
 
-        <div id="recaptcha-container"></div> {/* ✅ Always in DOM */}
+        <div id="recaptcha-container"></div> {/* ✅ Keep reCAPTCHA in DOM */}
 
         {confirmationResult ? (
           <>
@@ -100,6 +89,13 @@ export default function OTPLogin() {
           <>
             <input
               type="text"
+              placeholder="Enter Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mb-4 p-2 border rounded w-full"
+            />
+            <input
+              type="text"
               placeholder="Enter Phone Number (+91XXXXXXXXXX)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -112,11 +108,13 @@ export default function OTPLogin() {
         )}
       </div>
 
-      {/* ✅ Custom Popup */}
-      {popup.show && (
-        <div className={`fixed bottom-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white 
-            ${popup.type === "success" ? "bg-green-500" : "bg-red-500"}`}>
-          {popup.message}
+      {/* ✅ Custom Success Popup */}
+      {showSuccessPopup && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h3 className="text-xl font-semibold mb-2">✅ Login Successful!</h3>
+            <p>Welcome, {name} 🎉</p>
+          </div>
         </div>
       )}
     </div>
