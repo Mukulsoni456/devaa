@@ -1,23 +1,25 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
-
+import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { Link } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebaseConfig";
+import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaImages, FaInfoCircle, FaNewspaper, FaHandsHelping, FaPhone, FaSignInAlt } from "react-icons/fa";
+import { auth } from "../firebaseConfig";
 import "tailwindcss/tailwind.css";
 import BackNav from "./BackNav";
 
-
-
 const Navbar = () => {
-  const [active, setActive] = useState("home");
+  const location = useLocation();
+  const [active, setActive] = useState("");
 
+  // Detect active link based on the current URL
+  useEffect(() => {
+    const currentPath = location.pathname.toLowerCase();
+    const matchingNavItem = navItems.find((item) => item.link.toLowerCase() === currentPath);
+    if (matchingNavItem) {
+      setActive(matchingNavItem.name);
+    }
+  }, [location]);
 
   const [user, setUser] = useState(null);
-  const auth = getAuth();
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -36,57 +38,106 @@ const Navbar = () => {
     { name: "blogs", icon: <FaNewspaper size={24} />, label: "Blogs", link: "/blogs" },
     { name: "donation", icon: <FaHandsHelping size={24} />, label: "Donations", link: "/donation" },
     { name: "contact", icon: <FaPhone size={24} />, label: "Contact", link: "/contact" },
-    { name: "login", icon: <FaSignInAlt size={24} />, label: "Login", link: "/login" },
+
   ];
 
   return (
     <>
       {/* 🔹 Top Navbar */}
       <nav className="bg-[#fee7c7] z-60 p-4 hidden md:flex justify-between items-center shadow-md">
-      <div className="flex space-x-6 text-black font-medium">
-        <Link to="/" className="hover:text-orange-400">Home</Link>
-        <Link to="/Gallery" className="hover:text-orange-400">Gallery</Link>
-        <Link to="/about" className="hover:text-orange-400">About</Link>
-      </div>
+        <div className="flex space-x-6 text-black font-medium">
+          {navItems.slice(0, 6).map((item) => (
+            <Link
+              key={item.name}
+              to={item.link}
+              className={`hover:text-orange-400 ${
+                active === item.name ? "text-orange-500 font-bold" : ""
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
 
-      <div className="flex-grow flex justify-center">
-        <h1 className="text-black text-4xl font-bold">ॐ</h1>
-      </div>
+        <div className="flex-grow flex justify-center">
+          <h1 className="text-black text-4xl font-bold">ॐ</h1>
+        </div>
 
-      <div className="flex space-x-6 text-black font-medium">
-        <Link to="/blogs" className="hover:text-orange-400">Blogs</Link>
-        <Link to="/donation" className="hover:text-orange-400">Donations</Link>
-        <Link to="/contact" className="hover:text-orange-400">Contact Us</Link>
+        <div className="flex space-x-6 text-black font-medium">
+          {user ? (
+            <button onClick={handleLogout} className="hover:text-red-500">
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className={`hover:text-orange-400 ${
+                active === "login" ? "text-orange-500 font-bold" : ""
+              }`}
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      </nav>
 
-        {user ? (
-          <button onClick={handleLogout} className="hover:text-red-500">
-            Logout
-          </button>
-        ) : (
-          <Link to="/login" className="hover:text-orange-400">Login</Link>
-        )}
-      </div>
-    </nav>
-
-      {/* 🔹 Left Sidebar Navbar for Desktop */}
-      <nav className="hidden md:flex flex-col fixed top-0 left-0  w-20  bg-opacity-95  pt-44 z-50">
+      {/* 🔹 Left Sidebar Navbar */}
+      <nav className="hidden md:flex flex-col fixed bottom-10 left-0 w-20 bg-opacity-95 z-50">
         {navItems.map((item) => (
           <Link
             key={item.name}
             to={item.link}
-            className={`relative flex flex-col  items-center py-2 transition-all duration-300 ${
+            className={`flex flex-col items-center py-1 transition-all duration-300 ${
               active === item.name ? "text-[#B96D40]" : "text-gray-700"
             }`}
-            onClick={() => setActive(item.name)}
           >
-            <span className="text-xl bg-[#FFCF9C] p-3 rounded-full">{item.icon}</span>
-            {active === item.name && (
-              <span className="absolute left-16 bg-[#B96D40] text-xs text-white px-2 py-1 rounded-md shadow-md animate-fadeIn">
-                {item.label}
-              </span>
-            )}
+            <span
+              className={`text-2xl p-3 rounded-full transition-all ${
+                active === item.name ? "bg-[#B96D40] text-white" : "bg-[#FFCF9C] text-black"
+              }`}
+            >
+              {item.icon}
+            </span>
+            <span className="text-xs mt-2">{item.label}</span>
           </Link>
         ))}
+
+
+{user ? (
+  
+                  <div onClick={handleLogout}
+                  className={`flex flex-col items-center py-1 transition-all duration-300 ${
+                    active === "login" ? "text-[#B96D40]" : "text-gray-700"
+                  }`}
+                >
+                  <span
+                    className={`text-2xl p-3 rounded-full transition-all ${
+                      active === "login" ? "bg-[#B96D40] text-white" : "bg-[#FFCF9C] text-black"
+                    }`}
+                  >
+      <FaSignInAlt></FaSignInAlt>
+                  </span>
+                  <span className="text-xs mt-2">Logout</span>
+                </div>
+          ) : (
+            <Link to="/login"
+            className={`flex flex-col items-center py-1 transition-all duration-300 ${
+              active === "login" ? "text-[#B96D40]" : "text-gray-700"
+            }`}
+          >
+            <span
+              className={`text-2xl p-3 rounded-full transition-all ${
+                active === "login" ? "bg-[#B96D40] text-white" : "bg-[#FFCF9C] text-black"
+              }`}
+            >
+      <FaSignInAlt></FaSignInAlt>
+            </span>
+            <span className="text-xs mt-2">login</span>
+          </Link>
+          )}
+
+
+
       </nav>
 
       {/* 🔹 Bottom Navbar for Mobile */}
@@ -100,7 +151,6 @@ const Navbar = () => {
               className={`relative flex flex-col items-center p-2 transition-all duration-300 ${
                 active === item.name ? "text-orange-400" : "text-gray-700"
               }`}
-              onClick={() => setActive(item.name)}
             >
               <span className="text-lg">{item.icon}</span>
               {active === item.name && (
@@ -117,8 +167,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-// 🔹 Global CSS for Animations
-// .animate-fadeIn { animation: fadeIn 0.3s ease-in-out; }
-// @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); }}
-

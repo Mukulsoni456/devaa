@@ -48,13 +48,13 @@ export default function ImageGrid() {
           placeholder="Filter by Event Name" 
           value={eventFilter} 
           onChange={(e) => setEventFilter(e.target.value)}
-          className="px-4 py-2 border rounded-md"
+          className=" px-1 md:px-4 py-2 border rounded-md"
         />
         <input 
           type="date" 
           value={dateFilter} 
           onChange={(e) => setDateFilter(e.target.value)}
-          className="px-4 py-2 border rounded-md"
+          className="px-2 py-2 border rounded-md"
         />
         </div>
       </div>
